@@ -196,7 +196,9 @@ class Konfigurasi extends BaseController
         }
 
         $data = array_merge($this->base_data, [
+			
             'title' => 'Konfigurasi',
+			'komisi_ref' => $this->M_Base->u_get('komisi_ref'),
             'tripay' => [
                 'key' => $this->M_Base->u_get('tripay-key'),
                 'private' => $this->M_Base->u_get('tripay-private'),

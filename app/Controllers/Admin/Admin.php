@@ -162,13 +162,13 @@ class Admin extends BaseController {
 
         if ($this->admin == false) {
             $this->session->setFlashdata('error', 'Silahkan login dahulu');
-            return redirect()->to(base_url() . '/admin/login');
+            return redirect()->to(base_url() . '/admin-topupindo'); // <-- Ubah ke /admin-topupindo
         } else {
             if ($this->session->get('admin')) {
                 $this->session->remove('admin');
 
                 $this->session->setFlashdata('success', 'Logout berhasil');
-                return redirect()->to(base_url() . '/admin/login');
+                return redirect()->to(base_url() . '/admin-topupindo'); // <-- Ubah ke /admin-topupindo
             } else {
                 throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
             }

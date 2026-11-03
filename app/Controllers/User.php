@@ -69,7 +69,7 @@ class User extends BaseController {
 
             $data = array_merge($this->base_data, [
                 'title' => 'Beranda',
-                'username' => $users[0]['username'],
+                'username' => $this->users['username'],
                 'orders' => $this->M_Base->data_count('orders', ['username' => $this->users['username']]),
                 'jumlahorder' => $this->M_Base->jumlah('orders','price', [
                     'status' => 'Success',

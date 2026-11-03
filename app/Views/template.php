@@ -33,7 +33,7 @@
         <style>
             :root {
                 --warna: #001d38;
-                --warna_2: #082744;
+                --warna_2: #082744; 
                 --warna_3: #00396e;
             }
 
@@ -326,7 +326,7 @@
             }
             .item .metode {
                 margin: 5px 0;
-                background: #fff;
+                background: #fff; //garis kotak
                 border-radius: 8px;
                 padding: 0.75rem;
                 box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -1px rgb(0 0 0 / 6%) !important;
