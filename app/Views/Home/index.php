@@ -2,7 +2,9 @@
 
 <?php $this->section('css'); ?>
 <style>
-    .home-page { padding-top: var(--nav-h); }
+    .home-page {
+        padding-top: var(--nav-h);
+    }
 
     /* =========================================================
        BANNER FULL LAYAR (kiri-kanan mentok)
@@ -13,28 +15,33 @@
         background: var(--bg-soft);
         overflow: hidden;
     }
+
     .hero-banner .swiper-container {
         width: 100% !important;
         max-width: 100%;
         margin: 0;
         padding: 0;
     }
+
     .hero-banner .swiper-slide {
         width: 100%;
         height: auto;
         padding: 0;
     }
+
     .hero-banner .swiper-slide img {
         display: block;
         width: 100%;
         height: auto;
-        max-height: 560px;       /* batas tinggi di layar lebar; ubah sesuai selera */
+        max-height: 560px;
+        /* batas tinggi di layar lebar; ubah sesuai selera */
         object-fit: cover;
         object-position: center;
         margin: 0;
         border-radius: 0;
         box-shadow: none;
     }
+
     .hero-banner .swiper-pagination {
         position: absolute;
         bottom: 52px;
@@ -43,6 +50,7 @@
         text-align: center;
         z-index: 10;
     }
+
     .hero-banner .swiper-pagination-bullet {
         width: 8px;
         height: 8px;
@@ -54,6 +62,7 @@
         transition: all .25s ease;
         box-shadow: 0 1px 4px rgba(0, 0, 0, .35);
     }
+
     .hero-banner .swiper-pagination-bullet-active {
         width: 26px;
         height: 8px;
@@ -61,7 +70,9 @@
     }
 
     @media (max-width: 575.98px) {
-        .hero-banner .swiper-pagination { bottom: 44px; }
+        .hero-banner .swiper-pagination {
+            bottom: 44px;
+        }
     }
 
     /* =========================================================
@@ -77,15 +88,17 @@
         padding: 8px;
         box-shadow: var(--shadow-lg);
     }
+
     .tab-category {
         display: flex;
         flex-wrap: nowrap;
-        overflow-x: auto;
         gap: 6px;
-        scrollbar-width: none;
     }
-    .tab-category::-webkit-scrollbar { display: none; }
-    .tab-category .nav-item { flex: 1 0 76px; }
+
+    .tab-category .nav-item {
+        flex: 1 1 0;
+        min-width: 0;
+    }
 
     .tab-category.nav-pills .nav-link {
         margin: 0 !important;
@@ -101,21 +114,58 @@
         border: 0;
         transition: all .2s ease;
     }
+
     .tab-category.nav-pills .nav-link i {
         display: block;
         font-size: 24px;
         margin-bottom: 6px;
     }
+
     .tab-category.nav-pills .nav-link:hover {
         color: var(--primary);
         background: var(--primary-soft);
     }
+
     .tab-category.nav-pills .nav-link.active,
-    .tab-category.nav-pills .show > .nav-link {
+    .tab-category.nav-pills .show>.nav-link {
         color: #fff !important;
         background: var(--primary);
         border: 0;
         box-shadow: 0 8px 18px -8px rgba(29, 78, 216, .7);
+    }
+
+    /* Tablet & HP: menu kategori jadi grid yang rapi, tanpa geser samping */
+    @media (max-width: 767.98px) {
+        .cat-card {
+            margin-top: -24px;
+            border-radius: 16px;
+            padding: 6px;
+        }
+
+        .tab-category {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        .tab-category.nav-pills .nav-link {
+            padding: 10px 4px;
+            font-size: 11px;
+            letter-spacing: .02em;
+            white-space: nowrap;
+        }
+
+        .tab-category.nav-pills .nav-link i {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+    }
+
+    @media (max-width: 399.98px) {
+        .tab-category.nav-pills .nav-link {
+            font-size: 10px;
+            letter-spacing: 0;
+        }
     }
 
     .search-box {
@@ -123,6 +173,7 @@
         gap: 10px;
         margin: 22px 0 34px;
     }
+
     .search-box .form-control {
         flex: 1;
         height: 50px;
@@ -130,10 +181,35 @@
         padding: 0 22px;
         box-shadow: var(--shadow-sm);
     }
+
     .search-box .btn {
         height: 50px;
         padding: 0 30px;
         border-radius: 999px;
+    }
+
+    @media (max-width: 575.98px) {
+        .search-box {
+            margin: 16px 0 26px;
+            gap: 8px;
+        }
+
+        .search-box .form-control {
+            padding: 0 18px;
+            min-width: 0;
+        }
+
+        .search-box .btn {
+            padding: 0 22px;
+        }
+
+        .pay-title h2 {
+            font-size: 22px;
+        }
+
+        .section-title h5 {
+            font-size: 19px;
+        }
     }
 
     /* =========================================================
@@ -143,6 +219,7 @@
         display: block;
         margin-bottom: 22px;
     }
+
     .section-title h5 {
         display: inline-block;
         margin: 0;
@@ -150,6 +227,7 @@
         font-weight: 800;
         line-height: 1.2;
     }
+
     .section-title .title-bar {
         display: block;
         position: static;
@@ -161,7 +239,10 @@
         background: var(--primary);
     }
 
-    .game-col { margin-bottom: 22px; }
+    .game-col {
+        margin-bottom: 22px;
+    }
+
     .game-card {
         display: block;
         height: 100%;
@@ -174,11 +255,13 @@
         box-shadow: var(--shadow-sm);
         transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
     }
+
     .game-card:hover {
         transform: translateY(-5px);
         border-color: var(--primary);
         box-shadow: var(--shadow-lg);
     }
+
     .game-card img {
         display: block;
         width: 100%;
@@ -187,6 +270,7 @@
         border-radius: 14px;
         margin-bottom: 12px;
     }
+
     .game-card .game-name {
         color: var(--ink);
         font-size: 13.5px;
@@ -202,12 +286,31 @@
     /* =========================================================
        METODE PEMBAYARAN
     ========================================================= */
-    .pay-title { text-align: center; margin: 40px 0 22px; }
-    .pay-title h2 { font-size: 26px; font-weight: 800; margin: 0; }
-    .pay-title p { margin: 6px 0 0; font-size: 14.5px; }
+    .pay-title {
+        text-align: center;
+        margin: 40px auto 22px;
+    }
 
-    .owl-carousel { position: relative; width: 100%; }
-    .owl-carousel .owl-stage { position: relative; }
+    .pay-title h2 {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .pay-title p {
+        margin: 6px 0 0;
+        font-size: 14.5px;
+    }
+
+    .owl-carousel {
+        position: relative;
+        width: 100%;
+    }
+
+    .owl-carousel .owl-stage {
+        position: relative;
+    }
+
     .owl-carousel .owl-stage:after {
         content: ".";
         display: block;
@@ -216,8 +319,15 @@
         line-height: 0;
         height: 0;
     }
-    .owl-carousel .owl-stage-outer { position: relative; overflow: hidden; }
-    .owl-carousel.owl-loaded { display: block; }
+
+    .owl-carousel .owl-stage-outer {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .owl-carousel.owl-loaded {
+        display: block;
+    }
 
     .item .metode {
         display: flex;
@@ -229,13 +339,17 @@
         border: 1px solid var(--border);
         border-radius: 14px;
     }
+
     .item .metode img {
         max-height: 100%;
         width: auto;
         max-width: 100%;
         object-fit: contain;
     }
-    .metode-bottom { margin-bottom: 60px !important; }
+
+    .metode-bottom {
+        margin-bottom: 60px !important;
+    }
 </style>
 <?php $this->endSection(); ?>
 
@@ -251,11 +365,13 @@
     <section class="hero-banner">
         <div class="swiper-container hero-swiper">
             <div class="swiper-wrapper">
-                <?php $no = 1; foreach ($banner as $loop): ?>
-                <div class="swiper-slide">
-                    <img src="<?= base_url(); ?>/assets/images/banner/<?= $loop['image']; ?>" alt="Banner <?= $no; ?>">
-                </div>
-                <?php $no++; endforeach ?>
+                <?php $no = 1;
+                foreach ($banner as $loop): ?>
+                    <div class="swiper-slide">
+                        <img src="<?= base_url(); ?>/assets/images/banner/<?= $loop['image']; ?>" alt="Banner <?= $no; ?>">
+                    </div>
+                <?php $no++;
+                endforeach ?>
             </div>
             <div class="swiper-pagination"></div>
         </div>
@@ -265,36 +381,38 @@
     <div class="container">
         <div class="cat-card">
             <ul class="nav nav-pills tab-category" role="tablist">
-                <?php $no = 1; foreach ($games as $game): ?>
-                <li class="nav-item text-center">
-                    <a class="nav-link <?= $no == 1 ? 'active' : ''; ?>"
-                       data-bs-toggle="pill"
-                       href="#pills-<?= url_title($game['category'], '-', true); ?>"
-                       role="tab">
-                        <?php if ($game['category'] == 'Games'): ?>
-                            <i class="fa fa-gamepad"></i>
-                        <?php elseif ($game['category'] == 'Voucher'): ?>
-                            <i class="fa fa-ticket"></i>
-                        <?php elseif ($game['category'] == 'Pulsa'): ?>
-                            <i class="fa fa-phone"></i>
-                        <?php elseif ($game['category'] == 'Data'): ?>
-                            <i class="fa fa-mobile"></i>
-                        <?php elseif ($game['category'] == 'PLN'): ?>
-                            <i class="fa fa-flash"></i>
-                        <?php else: ?>
-                            <i class="fa fa-credit-card"></i>
-                        <?php endif; ?>
-                        <?= $game['category']; ?>
-                    </a>
-                </li>
-                <?php $no++; endforeach ?>
+                <?php $no = 1;
+                foreach ($games as $game): ?>
+                    <li class="nav-item text-center">
+                        <a class="nav-link <?= $no == 1 ? 'active' : ''; ?>"
+                            data-bs-toggle="pill"
+                            href="#pills-<?= url_title($game['category'], '-', true); ?>"
+                            role="tab">
+                            <?php if ($game['category'] == 'Games'): ?>
+                                <i class="fa fa-gamepad"></i>
+                            <?php elseif ($game['category'] == 'Voucher'): ?>
+                                <i class="fa fa-ticket"></i>
+                            <?php elseif ($game['category'] == 'Pulsa'): ?>
+                                <i class="fa fa-phone"></i>
+                            <?php elseif ($game['category'] == 'Data'): ?>
+                                <i class="fa fa-mobile"></i>
+                            <?php elseif ($game['category'] == 'PLN'): ?>
+                                <i class="fa fa-flash"></i>
+                            <?php else: ?>
+                                <i class="fa fa-credit-card"></i>
+                            <?php endif; ?>
+                            <?= $game['category']; ?>
+                        </a>
+                    </li>
+                <?php $no++;
+                endforeach ?>
             </ul>
         </div>
 
         <form action="" method="POST" class="search-box">
             <input type="text" class="form-control" autocomplete="off"
-                   placeholder="Mau topup games apa?"
-                   name="search" value="<?= esc($search ?? ''); ?>">
+                placeholder="Mau topup games apa?"
+                name="search" value="<?= esc($search ?? ''); ?>">
             <button class="btn btn-primary" type="submit">Cari</button>
         </form>
     </div>
@@ -302,30 +420,33 @@
     <!-- Daftar game per kategori -->
     <div class="container">
         <div class="tab-content">
-            <?php $no = 1; foreach ($games as $game): ?>
-            <div class="tab-pane fade <?= $no == 1 ? 'show active' : ''; ?>"
-                 id="pills-<?= url_title($game['category'], '-', true); ?>"
-                 role="tabpanel">
+            <?php $no = 1;
+            foreach ($games as $game): ?>
+                <div class="tab-pane fade <?= $no == 1 ? 'show active' : ''; ?>"
+                    id="pills-<?= url_title($game['category'], '-', true); ?>"
+                    role="tabpanel">
 
-                <div class="section-title">
-                    <h5><?= $game['category']; ?></h5>
-                    <span class="title-bar"></span>
-                </div>
-
-                <div class="row game">
-                    <?php foreach ($game['games'] as $loop): ?>
-                    <?php if ($loop['status'] == 'On'): ?>
-                    <div class="col-lg-2 col-md-3 col-4 game-col">
-                        <a href="<?= base_url(); ?>/games/<?= $loop['slug']; ?>" class="game-card product_list">
-                            <img src="<?= base_url(); ?>/assets/images/games/<?= $loop['image']; ?>"
-                                 alt="<?= $loop['games']; ?>" loading="lazy">
-                            <div class="game-name"><?= $loop['games']; ?></div>
-                        </a>
+                    <div class="section-title">
+                        <h5><?= $game['category']; ?></h5>
+                        <span class="title-bar"></span>
                     </div>
-                    <?php endif; endforeach ?>
+
+                    <div class="row game">
+                        <?php foreach ($game['games'] as $loop): ?>
+                            <?php if ($loop['status'] == 'On'): ?>
+                                <div class="col-lg-2 col-md-3 col-4 game-col">
+                                    <a href="<?= base_url(); ?>/games/<?= $loop['slug']; ?>" class="game-card product_list">
+                                        <img src="<?= base_url(); ?>/assets/images/games/<?= $loop['image']; ?>"
+                                            alt="<?= $loop['games']; ?>" loading="lazy">
+                                        <div class="game-name"><?= $loop['games']; ?></div>
+                                    </a>
+                                </div>
+                        <?php endif;
+                        endforeach ?>
+                    </div>
                 </div>
-            </div>
-            <?php $no++; endforeach ?>
+            <?php $no++;
+            endforeach ?>
         </div>
     </div>
 
@@ -337,21 +458,21 @@
 
     <div class="owl-carousel metode-top owl-theme">
         <?php foreach ($method as $loop): ?>
-        <div class="item">
-            <div class="metode">
-                <img src="<?= base_url(); ?>/assets/images/method/<?= $loop['image']; ?>" alt="">
+            <div class="item">
+                <div class="metode">
+                    <img src="<?= base_url(); ?>/assets/images/method/<?= $loop['image']; ?>" alt="">
+                </div>
             </div>
-        </div>
         <?php endforeach ?>
     </div>
 
     <div class="owl-carousel metode-bottom owl-theme mt-3">
         <?php foreach ($method as $loop): ?>
-        <div class="item">
-            <div class="metode">
-                <img src="<?= base_url(); ?>/assets/images/method/<?= $loop['image']; ?>" alt="">
+            <div class="item">
+                <div class="metode">
+                    <img src="<?= base_url(); ?>/assets/images/method/<?= $loop['image']; ?>" alt="">
+                </div>
             </div>
-        </div>
         <?php endforeach ?>
     </div>
 
@@ -382,9 +503,15 @@
         autoplayTimeout: 1800,
         smartSpeed: 600,
         responsive: {
-            0:    { items: 3 },
-            600:  { items: 4 },
-            1000: { items: 7 }
+            0: {
+                items: 3
+            },
+            600: {
+                items: 4
+            },
+            1000: {
+                items: 7
+            }
         }
     });
     $('.metode-bottom').owlCarousel({
@@ -395,9 +522,15 @@
         smartSpeed: 600,
         rtl: true,
         responsive: {
-            0:    { items: 3 },
-            600:  { items: 4 },
-            1000: { items: 7 }
+            0: {
+                items: 3
+            },
+            600: {
+                items: 4
+            },
+            1000: {
+                items: 7
+            }
         }
     });
 </script>
