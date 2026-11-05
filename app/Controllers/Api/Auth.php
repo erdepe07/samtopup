@@ -57,6 +57,9 @@ class Auth extends BaseApi
         $pass = trim((string) ($in['password'] ?? ''));
         $wa = preg_replace('/\D/', '', (string) ($in['whatsapp'] ?? ''));
 
+        if (isset($in['password_confirm']) && trim((string) $in['password_confirm']) !== $pass) {
+            return $this->fail('Konfirmasi password tidak sesuai.');
+        }
         if (!preg_match('/^[A-Za-z0-9_.]{3,30}$/', $username)) {
             return $this->fail('Username 3-30 karakter: huruf, angka, titik, garis bawah.');
         }
