@@ -119,4 +119,85 @@ abstract class BaseApi extends Controller
     {
         return in_array($g['check_code'], ['mobilelegends', 'mobilelegend'], true);
     }
+
+    /** Detail transaksi Tripay (QR/kode bayar) dari nomor referensi; di-cache agar tidak membebani Tripay. */
+    protected function tripayDetail(string $reference): ?array
+    {
+        if (!preg_match('/^[A-Za-z0-9]{6,40}$/', $reference)) {
+            return null;
+        }
+        $key = 'tripay_detail_' . $reference;
+        $hit = cache($key);
+        if (is_array($hit)) {
+            return $hit;
+        }
+        $ch = curl_init('https://tripay.co.id/api/transaction/detail?' . http_build_query(['reference' => $reference]));
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $this->M_Base->u_get('tripay-key')],
+            CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+            CURLOPT_TIMEOUT => 15,
+        ]);
+        $out = curl_exec($ch);
+        curl_close($ch);
+        $j = json_decode((string) $out, true);
+        if (is_array($j) && !empty($j['success']) && is_array($j['data'] ?? null)) {
+            $d = $j['data'];
+            $keep = ['qr_url' => (string) ($d['qr_url'] ?? ''), 'qr_string' => (string) ($d['qr_string'] ?? ''),
+                'pay_code' => (string) ($d['pay_code'] ?? '')];
+            cache()->save($key, $keep, 600);
+            return $keep;
+        }
+        return null;
+    }
+
+    /** Bentuk objek `payment` untuk pesanan & isi saldo (belum lunas). */
+    protected function buildPayment(string $gateway, string $code, string $ptype, string $methodName, int $methodId, int $created): ?array
+    {
+        $base = ['type' => 'va', 'checkout_url' => '', 'qr_url' => '', 'qr_string' => '', 'pay_code' => '',
+            'pay_label' => '', 'instruction' => '', 'expired_at' => date('c', $created + 86400)];
+
+        if ($gateway === 'Balance') {
+            return array_merge($base, ['type' => 'balance', 'expired_at' => null]);
+        }
+
+        if ($gateway === 'Manual') { // transfer manual: kode = nomor rekening
+            $m = $this->db->table('method')->where('id', $methodId)->get()->getRowArray();
+            $ins = $m ? trim(strip_tags(html_entity_decode(html_entity_decode((string) $m['instruksi'])))) : '';
+            return array_merge($base, ['type' => 'va', 'pay_code' => $code, 'pay_label' => $methodName,
+                'instruction' => $ins, 'expired_at' => null]);
+        }
+
+        if ($gateway !== 'Tripay') {
+            return null;
+        }
+
+        $isUrl = preg_match('#^https?://#', $code) === 1;
+        $qrUrl = ($isUrl && strpos($code, '/qr/') !== false) ? $code : '';
+        $qrString = '';
+        $payCode = $isUrl ? '' : $code;
+        $checkout = '';
+
+        if ($isUrl && $qrUrl === '') { // alamat checkout: ambil QR / kode bayar asli dari Tripay
+            $checkout = $code;
+            $d = $this->tripayDetail(basename((string) parse_url($code, PHP_URL_PATH)));
+            if ($d) {
+                $qrUrl = $d['qr_url'];
+                $qrString = $d['qr_string'];
+                $payCode = $d['pay_code'];
+            }
+        }
+
+        if ($qrUrl !== '' || $qrString !== '') {
+            $type = 'qris';
+            $checkout = '';
+        } elseif ($payCode !== '') {
+            $type = $ptype === 'Convenience Store' ? 'retail' : 'va';
+            $checkout = '';
+        } else {
+            $type = 'redirect';
+        }
+        return array_merge($base, ['type' => $type, 'checkout_url' => $checkout, 'qr_url' => $qrUrl,
+            'qr_string' => $qrString, 'pay_code' => $payCode, 'pay_label' => $payCode !== '' ? $methodName : '']);
+    }
 }

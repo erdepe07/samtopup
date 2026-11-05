@@ -53,8 +53,8 @@ class Games extends BaseApi
 
         $methods = [];
         foreach ($this->M_Base->data_where('method', 'status', 'On') as $m) {
-            if ($m['provider'] !== 'Tripay') {
-                continue; // app: hanya Tripay + saldo (Manual butuh upload bukti di web)
+            if (!in_array($m['provider'], ['Tripay', 'Manual'], true)) {
+                continue;
             }
             $methods[] = [
                 'code' => $this->methodCode($m),

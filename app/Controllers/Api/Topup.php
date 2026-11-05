@@ -18,7 +18,7 @@ class Topup extends BaseApi
     {
         $list = [];
         foreach ($this->M_Base->data_where('method', 'status', 'On') as $m) {
-            if ($m['provider'] !== 'Tripay') {
+            if (!in_array($m['provider'], ['Tripay', 'Manual'], true)) {
                 continue;
             }
             $list[] = [
@@ -51,8 +51,11 @@ class Topup extends BaseApi
             return $this->fail('Isi saldo maksimal Rp ' . number_format(self::MAX, 0, ',', '.'));
         }
         $method = $this->findMethod($mcode);
-        if (!$method || $method['provider'] !== 'Tripay') {
+        if (!$method || !in_array($method['provider'], ['Tripay', 'Manual'], true)) {
             return $this->fail('Metode pembayaran tidak tersedia.', 404);
+        }
+        if ($method['provider'] === 'Manual' && (trim($method['rek']) === '' || trim($method['rek']) === '-')) {
+            return $this->fail('Rekening metode ini belum diatur. Pilih metode lain.');
         }
 
         $dupe = $this->db->table('topup')->where('username', $u['username'])->where('method_id', $method['id'])
@@ -69,14 +72,18 @@ class Topup extends BaseApi
             $id = date('Ymd') . random_int(100000, 999999);
         } while ($this->db->table('topup')->where('topup_id', $id)->countAllResults() > 0);
 
-        $r = $this->tripayCreate($method['code'], $id, $total, $u);
-        if (!is_array($r) || empty($r['success'])) {
-            return $this->fail('Pembayaran gagal dibuat: ' . ($r['message'] ?? 'tidak dapat terhubung ke Tripay'), 502);
-        }
-        $d = $r['data'];
-        $code = !empty($d['qr_url']) ? $d['qr_url'] : (!empty($d['pay_code']) ? $d['pay_code'] : ($d['checkout_url'] ?? ''));
-        if ($code === '') {
-            return $this->fail('Pembayaran gagal dibuat.', 502);
+        if ($method['provider'] === 'Manual') {
+            $code = $method['rek'];
+        } else {
+            $r = $this->tripayCreate($method['code'], $id, $total, $u);
+            if (!is_array($r) || empty($r['success'])) {
+                return $this->fail('Pembayaran gagal dibuat: ' . ($r['message'] ?? 'tidak dapat terhubung ke Tripay'), 502);
+            }
+            $d = $r['data'];
+            $code = !empty($d['qr_url']) ? $d['qr_url'] : (!empty($d['pay_code']) ? $d['pay_code'] : ($d['checkout_url'] ?? ''));
+            if ($code === '') {
+                return $this->fail('Pembayaran gagal dibuat.', 502);
+            }
         }
 
         $this->db->table('topup')->insert([
@@ -90,7 +97,7 @@ class Topup extends BaseApi
             'date_create' => date('Y-m-d H:i:s'),
             'payment_type' => $method['type'],
             'method_code' => $method['code'],
-            'payment_gateway' => 'Tripay',
+            'payment_gateway' => $method['provider'],
         ]);
 
         $row = $this->db->table('topup')->where('topup_id', $id)->get()->getRowArray();
@@ -157,17 +164,8 @@ class Topup extends BaseApi
 
         $payment = null;
         if ($st === 'pending') {
-            $code = (string) $t['payment_code'];
-            $isUrl = preg_match('#^https?://#', $code) === 1;
-            $isQr = $isUrl && strpos($code, '/qr/') !== false;
-            $payment = [
-                'type' => $isQr ? 'qris' : ($isUrl ? 'redirect' : (($t['payment_type'] ?? '') === 'Convenience Store' ? 'retail' : 'va')),
-                'checkout_url' => ($isUrl && !$isQr) ? $code : '',
-                'qr_url' => $isQr ? $code : '',
-                'pay_code' => $isUrl ? '' : $code,
-                'pay_label' => $isUrl ? '' : $t['method'],
-                'expired_at' => date('c', $created + 86400),
-            ];
+            $payment = $this->buildPayment((string) ($t['payment_gateway'] ?: 'Tripay'), (string) $t['payment_code'],
+                (string) ($t['payment_type'] ?? ''), $t['method'], (int) $t['method_id'], $created);
         }
 
         return [

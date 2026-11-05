@@ -63,8 +63,11 @@ class Orders extends BaseApi
             if (!$method) {
                 return $this->fail('Metode pembayaran tidak tersedia.', 404);
             }
-            if (!in_array($method['provider'], ['Tripay'], true)) {
+            if (!in_array($method['provider'], ['Tripay', 'Manual'], true)) {
                 return $this->fail('Metode ini hanya tersedia di website.');
+            }
+            if ($method['provider'] === 'Manual' && (trim($method['rek']) === '' || trim($method['rek']) === '-')) {
+                return $this->fail('Rekening metode ini belum diatur. Pilih metode lain.');
             }
         }
 
@@ -73,6 +76,8 @@ class Orders extends BaseApi
         if ($price < 1) {
             return $this->fail('Harga produk belum diatur.');
         }
+        // kode unik (transfer manual) ditambahkan ke total, sama seperti web
+        $price += ($method['uniq'] ?? 'N') === 'Y' ? random_int(0, 999) : 0;
 
         // ---- cegah pesanan ganda (30 detik)
         $dupe = $this->db->table('orders')->where('user_id', $uid)->where('zone_id', $zone)
@@ -100,6 +105,8 @@ class Orders extends BaseApi
                 if ($payCode === '') {
                     return $this->fail('Pembayaran gagal dibuat.', 502);
                 }
+            } elseif ($method['provider'] === 'Manual') {
+                $payCode = $method['rek'];
             } else { // saldo: potong atomik agar tidak bisa minus / dobel
                 $this->db->query('UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?',
                     [$price, $user['id'], $price]);
@@ -334,22 +341,8 @@ class Orders extends BaseApi
 
         $payment = null;
         if ($st === 'pending' || $st === 'processing') {
-            $code = (string) $o['payment_code'];
-            if ($o['payment_gateway'] === 'Balance') {
-                $payment = ['type' => 'balance', 'checkout_url' => '', 'qr_url' => '', 'pay_code' => '', 'pay_label' => '', 'expired_at' => null];
-            } elseif ($o['payment_gateway'] === 'Tripay') {
-                $isUrl = preg_match('#^https?://#', $code) === 1;
-                $isQr = $isUrl && strpos($code, '/qr/') !== false;
-                $type = $isQr ? 'qris' : ($isUrl ? 'redirect' : ($o['payment_type'] === 'Convenience Store' ? 'retail' : 'va'));
-                $payment = [
-                    'type' => $type,
-                    'checkout_url' => ($isUrl && !$isQr) ? $code : '',
-                    'qr_url' => $isQr ? $code : '',
-                    'pay_code' => $isUrl ? '' : $code,
-                    'pay_label' => $isUrl ? '' : $o['method'],
-                    'expired_at' => date('c', $created + 86400),
-                ];
-            }
+            $payment = $this->buildPayment($o['payment_gateway'], (string) $o['payment_code'], (string) $o['payment_type'],
+                $o['method'], (int) $o['method_id'], $created);
         }
 
         return [
