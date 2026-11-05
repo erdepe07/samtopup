@@ -47,6 +47,10 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api'], static function
     $routes->post('auth/login', 'Auth::login');
     $routes->post('auth/register', 'Auth::register');
     $routes->post('auth/logout', 'Auth::logout');
+    $routes->get('topup/methods', 'Topup::methods', ['filter' => 'apiauth']);
+    $routes->get('topup', 'Topup::mine', ['filter' => 'apiauth']);
+    $routes->post('topup', 'Topup::create', ['filter' => 'apiauth']);
+    $routes->get('topup/(:segment)', 'Topup::show/$1', ['filter' => 'apiauth']);
     $routes->get('me', 'Auth::me', ['filter' => 'apiauth']);
     $routes->post('device-token', 'Devices::store', ['filter' => 'apiauth']);
 });
