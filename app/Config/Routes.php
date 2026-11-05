@@ -37,6 +37,21 @@ $routes->setAutoRoute(true);
 // route since we don't have to scan directories.
 $routes->match(['get', 'post'], '/', 'Home::index');
 
+$routes->group('api/v1', ['namespace' => 'App\Controllers\Api'], static function ($routes) {
+    $routes->get('home', 'Home::index');
+    $routes->get('games/(:segment)', 'Games::show/$1');
+    $routes->post('games/(:segment)/check-nickname', 'Games::checkNickname/$1');
+    $routes->post('orders', 'Orders::create');
+    $routes->get('orders', 'Orders::mine', ['filter' => 'apiauth']);
+    $routes->get('orders/(:segment)', 'Orders::show/$1');
+    $routes->post('auth/login', 'Auth::login');
+    $routes->post('auth/register', 'Auth::register');
+    $routes->post('auth/logout', 'Auth::logout');
+    $routes->get('me', 'Auth::me', ['filter' => 'apiauth']);
+    $routes->post('device-token', 'Devices::store', ['filter' => 'apiauth']);
+});
+
+
 $routes->match(['get', 'post'], '/games/voucher/(:num)/', 'Games::voucher/$1');
 $routes->match(['get', 'post'], '/games/order/(:any)/(:any)', 'Games::order/$1/$2');
 $routes->match(['get', 'post'], '/games/(:any)', 'Games::index/$1');

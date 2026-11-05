@@ -1,0 +1,16 @@
+// 1) Di app/Config/Filters.php, tambahkan use di atas:
+use App\Filters\ApiAuth;
+
+// 2) Di $aliases tambahkan satu baris:
+public array $aliases = [
+    // ... yang sudah ada ...
+    'apiauth' => ApiAuth::class,
+];
+
+// 3) Bila CSRF global aktif ($globals['before'] berisi 'csrf'), kecualikan API:
+public array $globals = [
+    'before' => [
+        'csrf' => ['except' => ['api/*', 'sistem/callback/*']],
+    ],
+];
+// (Bila CSRF tidak aktif di web Anda, lewati langkah 3.)
