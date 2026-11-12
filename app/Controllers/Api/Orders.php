@@ -212,9 +212,25 @@ class Orders extends BaseApi
     public function mine()
     {
         $u = $GLOBALS['api_user'];
+
+        // Filter tanggal (YYYY-MM-DD). Bawaan: hari ini. Maksimal 93 hari agar ringan.
+        $from = (string) $this->request->getGet('from');
+        $to = (string) $this->request->getGet('to');
+        $ok = static fn ($d) => preg_match('/^\d{4}-\d{2}-\d{2}$/', $d) === 1 && strtotime($d) !== false;
+        $today = date('Y-m-d');
+        $from = $ok($from) ? $from : $today;
+        $to = $ok($to) ? $to : $from;
+        if (strtotime($to) < strtotime($from)) {
+            [$from, $to] = [$to, $from];
+        }
+        if (strtotime($to) - strtotime($from) > 93 * 86400) {
+            return $this->fail('Rentang tanggal maksimal 3 bulan.');
+        }
+
         $rows = $this->db->table('orders')->where('username', $u['username'])
-            ->orderBy('id', 'DESC')->limit(50)->get()->getResultArray();
-        return $this->ok(['orders' => array_map([$this, 'format'], $rows)]);
+            ->where('date_create >=', $from . ' 00:00:00')->where('date_create <=', $to . ' 23:59:59')
+            ->orderBy('id', 'DESC')->limit(300)->get()->getResultArray();
+        return $this->ok(['from' => $from, 'to' => $to, 'orders' => array_map([$this, 'format'], $rows)]);
     }
 
     // ------------------------------------------------------------- internal
