@@ -26,9 +26,8 @@ class Home extends BaseApi
                     ];
                 }
             }
-            if ($list) {
-                $categories[] = ['name' => $c['category'], 'games' => $list];
-            }
+            // kategori kosong tetap dikirim (web juga menampilkannya)
+            $categories[] = ['name' => $c['category'], 'games' => $list];
         }
 
         $methods = [];
